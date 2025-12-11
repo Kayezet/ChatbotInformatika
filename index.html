@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<title>Chatbot Informatika SMA Kurikulum Merdeka</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body{margin:0;font-family:Segoe UI;background:linear-gradient(135deg,#667eea,#764ba2);height:100vh;display:flex}
+.sidebar{width:260px;background:#fff;padding:15px;overflow-y:auto}
+.sidebar h2{text-align:center}
+.modul{background:#eef;margin:8px 0;padding:10px;border-radius:10px;cursor:pointer;text-align:center;font-weight:600}
+.modul:hover{background:#667eea;color:#fff}
+.main{flex:1;display:flex;flex-direction:column;background:#f7f7f7}
+.header{background:#667eea;color:#fff;padding:15px;text-align:center}
+.chat-box{flex:1;padding:15px;overflow-y:auto}
+.msg{margin:8px 0;max-width:85%;padding:12px;border-radius:12px;white-space:pre-line}
+.user{background:#667eea;color:#fff;margin-left:auto}
+.bot{background:#fff;border:1px solid #ddd}
+.input-area{display:flex;padding:10px;background:#fff;border-top:1px solid #ddd}
+input{flex:1;padding:10px;border-radius:20px;border:1px solid #ccc}
+button{border:none;background:#667eea;color:#fff;padding:10px 15px;margin-left:5px;border-radius:20px;cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- ===== MODUL DIGITAL ===== -->
+<div class="sidebar">
+  <h2>📘 Modul Informatika SMA</h2>
+
+  <div class="modul" onclick="autoSend('algoritma')">Algoritma</div>
+  <div class="modul" onclick="autoSend('representasi data')">Representasi Data</div>
+  <div class="modul" onclick="autoSend('berpikir komputasional')">Berpikir Komputasional</div>
+  <div class="modul" onclick="autoSend('jaringan komputer')">Jaringan</div>
+  <div class="modul" onclick="autoSend('internet')">Internet</div>
+  <div class="modul" onclick="autoSend('keamanan digital')">Keamanan Digital</div>
+  <div class="modul" onclick="autoSend('basis data')">Basis Data</div>
+  <div class="modul" onclick="autoSend('pemrograman')">Pemrograman</div>
+  <div class="modul" onclick="autoSend('ai')">Kecerdasan Buatan</div>
+  <div class="modul" onclick="autoSend('iot')">IoT</div>
+  <div class="modul" onclick="autoSend('big data')">Big Data</div>
+  <div class="modul" onclick="autoSend('etika digital')">Etika Digital</div>
+</div>
+
+<!-- ===== CHAT ===== -->
+<div class="main">
+  <div class="header">
+    <h2>🤖 Chatbot Informatika SMA</h2>
+    <p>Kurikulum Merdeka | Proyek Presentasi</p>
+  </div>
+
+  <div id="chatBox" class="chat-box">
+    <div class="msg bot">
+Halo! Saya Chatbot Informatika SMA Kurikulum Merdeka ✅  
+Saya bisa:
+• Menjelaskan materi  
+• Menganalisis pertanyaan  
+• Memberi contoh  
+• Merespons dengan suara 🎙️  
+    </div>
+  </div>
+
+  <div class="input-area">
+    <input id="userInput" placeholder="Ketik pertanyaan...">
+    <button onclick="voice()">🎙️</button>
+    <button onclick="send()">Kirim</button>
+  </div>
+</div>
+
+<script>
+/* =========================================================
+   DATABASE BESAR (TINGGAL TAMBAH → BISA 1000+ DATA)
+========================================================= */
+const KB = [
+
+{ kunci:["algoritma"], level:"konsep", jawab:`📘 ALGORITMA
+Pengertian: Urutan langkah logis untuk menyelesaikan masalah.
+Fungsi: Dasar semua program komputer.
+Contoh: Algoritma mencari nilai terbesar.
+Analisis: Tanpa algoritma, program tidak efisien dan sulit dikembangkan.` },
+
+{ kunci:["flowchart"], level:"visual", jawab:`📘 FLOWCHART
+Diagram alir untuk menggambarkan algoritma.
+Simbol: Proses, input-output, keputusan.
+Analisis: Membantu memahami alur sebelum coding.` },
+
+{ kunci:["berpikir komputasional"], jawab:`📘 BERPIKIR KOMPUTASIONAL
+Cara berpikir sistematis untuk memecahkan masalah.
+Tahapan: Dekomposisi, abstraksi, algoritma.
+Analisis: Digunakan di semua bidang, tidak hanya IT.` },
+
+{ kunci:["representasi data"], jawab:`📘 REPRESENTASI DATA
+Cara menyajikan data dalam bentuk digital.
+Contoh: Biner, desimal, hexadesimal.
+Analisis: Komputer hanya memahami biner.` },
+
+{ kunci:["biner"], jawab:`📘 BILANGAN BINER
+Sistem bilangan berbasis 2 (0 dan 1).
+Digunakan komputer sebagai bahasa mesin.
+Analisis: Dasar semua proses digital.` },
+
+{ kunci:["jaringan komputer"], jawab:`📘 JARINGAN KOMPUTER
+Menghubungkan beberapa komputer untuk berbagi data.
+Jenis: LAN, MAN, WAN.
+Analisis: Tanpa jaringan, internet tidak ada.` },
+
+{ kunci:["internet"], jawab:`📘 INTERNET
+Jaringan global penghubung dunia.
+Fungsi: Informasi, komunikasi, transaksi.
+Analisis: Tulang punggung era digital.` },
+
+{ kunci:["ip address"], jawab:`📘 IP ADDRESS
+Alamat unik perangkat pada jaringan.
+Contoh: 192.168.1.1
+Analisis: Tanpa IP, data tidak bisa dikirim.` },
+
+{ kunci:["dns"], jawab:`📘 DNS
+Mengubah nama domain menjadi IP.
+Contoh: google.com → IP Address.
+Analisis: Memudahkan manusia mengingat alamat.` },
+
+{ kunci:["keamanan digital"], jawab:`📘 KEAMANAN DIGITAL
+Upaya melindungi data dari ancaman.
+Contoh: Password, enkripsi, firewall.
+Analisis: Tanpa keamanan, data mudah dicuri.` },
+
+{ kunci:["virus komputer"], jawab:`📘 VIRUS KOMPUTER
+Program jahat yang merusak sistem.
+Contoh: Trojan, Worm.
+Analisis: Menyebabkan kerugian besar.` },
+
+{ kunci:["antivirus"], jawab:`📘 ANTIVIRUS
+Program pelindung dari malware.
+Analisis: Penting untuk keamanan sistem.` },
+
+{ kunci:["basis data"], jawab:`📘 BASIS DATA
+Kumpulan data terstruktur.
+Contoh: Data siswa.
+Analisis: Memudahkan penyimpanan & pencarian.` },
+
+{ kunci:["sql"], jawab:`📘 SQL
+Bahasa untuk mengelola basis data.
+Contoh: SELECT, INSERT.
+Analisis: Digunakan di hampir semua aplikasi.` },
+
+{ kunci:["pemrograman"], jawab:`📘 PEMROGRAMAN
+Proses menulis instruksi ke komputer.
+Contoh: Python, Java.
+Analisis: Inti dari teknologi digital.` },
+
+{ kunci:["variabel"], jawab:`📘 VARIABEL
+Tempat menyimpan data sementara.
+Analisis: Elemen dasar semua program.` },
+
+{ kunci:["ai","kecerdasan buatan"], jawab:`📘 KECERDASAN BUATAN (AI)
+Kemampuan mesin meniru kecerdasan manusia.
+Contoh: Chatbot, face recognition.
+Analisis: Mengubah banyak bidang kehidupan.` },
+
+{ kunci:["machine learning"], jawab:`📘 MACHINE LEARNING
+AI yang belajar dari data.
+Analisis: Digunakan pada rekomendasi & prediksi.` },
+
+{ kunci:["iot"], jawab:`📘 INTERNET OF THINGS
+Perangkat saling terhubung melalui internet.
+Contoh: Smart lamp.
+Analisis: Menghasilkan big data.` },
+
+{ kunci:["big data"], jawab:`📘 BIG DATA
+Data dalam jumlah sangat besar.
+Analisis: Digunakan untuk analisis perilaku.` },
+
+{ kunci:["cloud computing"], jawab:`📘 CLOUD COMPUTING
+Layanan penyimpanan & server online.
+Contoh: Google Drive.
+Analisis: Mengurangi biaya infrastruktur.` },
+
+{ kunci:["etika digital"], jawab:`📘 ETIKA DIGITAL
+Aturan moral dalam penggunaan teknologi.
+Contoh: Tidak menyebar hoaks.
+Analisis: Menjaga dampak positif teknologi.` },
+
+{ kunci:["ipv4"], jawab:`📘 IPv4\nVersi alamat IP 32 bit.` },
+{ kunci:["ipv6"], jawab:`📘 IPv6\nPengganti IPv4 dengan 128 bit.` },
+{ kunci:["tcp"], jawab:`📘 TCP\nProtokol pengiriman data reliabel.` },
+{ kunci:["udp"], jawab:`📘 UDP\nProtokol cepat tanpa koneksi.` },
+{ kunci:["router"], jawab:`📘 ROUTER\nPenghubung antar jaringan.` },
+{ kunci:["switch"], jawab:`📘 SWITCH\nPenghubung perangkat dalam LAN.` },
+{ kunci:["html"], jawab:`📘 HTML\nStruktur web.` },
+{ kunci:["css"], jawab:`📘 CSS\nPengatur tampilan web.` },
+{ kunci:["javascript"], jawab:`📘 JavaScript\nBahasa web interaktif.` },
+{ kunci:["framework"], jawab:`📘 FRAMEWORK\nAlat bantu pemrograman.` },
+
+{ kunci:["flowchart simbol"], jawab:`📘 SIMBOL FLOWCHART
+Simbol standar untuk menggambar alur logika.
+Contoh: Oval (start), Jajar genjang (input/output).
+Analisis: Simbol menyederhanakan pemahaman algoritma.` },
+
+{ kunci:["pseudocode"], jawab:`📘 PSEUDOCODE
+Penulisan algoritma dengan bahasa sederhana.
+Analisis: Menjembatani ide ke kode program.` },
+
+{ kunci:["debugging"], jawab:`📘 DEBUGGING
+Proses mencari dan memperbaiki kesalahan program.
+Analisis: Wajib dalam pengembangan software.` },
+
+{ kunci:["error"], jawab:`📘 ERROR
+Kesalahan dalam program.
+Jenis: Syntax error, logic error.
+Analisis: Error dapat menyebabkan program gagal.` },
+
+{ kunci:["compiler"], jawab:`📘 COMPILER
+Program penerjemah kode ke bahasa mesin.
+Contoh: GCC, Java Compiler.
+Analisis: Tanpa compiler program tak bisa dijalankan.` },
+
+{ kunci:["interpreter"], jawab:`📘 INTERPRETER
+Menerjemahkan program baris demi baris.
+Contoh: Python.
+Analisis: Lebih fleksibel dari compiler.` },
+
+{ kunci:["operating system","os"], jawab:`📘 SISTEM OPERASI
+Pengelola perangkat keras dan lunak.
+Contoh: Windows, Linux.
+Analisis: Tanpa OS komputer tidak bisa digunakan.` },
+
+{ kunci:["kernel"], jawab:`📘 KERNEL
+Inti dari sistem operasi.
+Analisis: Penghubung software dan hardware.` },
+
+{ kunci:["perangkat keras","hardware"], jawab:`📘 HARDWARE
+Komponen fisik komputer.
+Contoh: CPU, RAM.
+Analisis: Menentukan performa komputer.` },
+
+{ kunci:["perangkat lunak","software"], jawab:`📘 SOFTWARE
+Program pada komputer.
+Contoh: Word, Browser.
+Analisis: Tanpa software hardware tak berguna.` },
+
+{ kunci:["cpu"], jawab:`📘 CPU
+Otak dari komputer.
+Analisis: Menentukan kecepatan proses.` },
+
+{ kunci:["ram"], jawab:`📘 RAM
+Memori sementara komputer.
+Analisis: Semakin besar RAM semakin multitasking.` },
+
+{ kunci:["rom"], jawab:`📘 ROM
+Memori permanen.
+Analisis: Menyimpan sistem dasar.` },
+
+{ kunci:["input device"], jawab:`📘 INPUT DEVICE
+Alat masukan data.
+Contoh: Keyboard, mouse.
+Analisis: Penghubung pengguna dengan sistem.` },
+
+{ kunci:["output device"], jawab:`📘 OUTPUT DEVICE
+Alat keluaran data.
+Contoh: Monitor, printer.
+Analisis: Menyajikan hasil proses.` },
+
+{ kunci:["topologi jaringan"], jawab:`📘 TOPOLOGI JARINGAN
+Susunan hubungan antar komputer.
+Jenis: Star, bus, ring.
+Analisis: Menentukan keandalan jaringan.` },
+
+{ kunci:["server"], jawab:`📘 SERVER
+Komputer penyedia layanan.
+Analisis: Pusat layanan data.` },
+
+{ kunci:["client"], jawab:`📘 CLIENT
+Penerima layanan dari server.
+Analisis: Pengguna tergantung server.` },
+
+{ kunci:["http request"], jawab:`📘 HTTP REQUEST
+Permintaan data dari client ke server.
+Analisis: Dasar komunikasi web.` },
+
+{ kunci:["hosting"], jawab:`📘 HOSTING
+Tempat menyimpan website.
+Analisis: Agar website bisa diakses.` },
+
+{ kunci:["domain"], jawab:`📘 DOMAIN
+Nama unik website.
+Contoh: google.com
+Analisis: Mengganti alamat IP.` },
+
+{ kunci:["enkripsi"], jawab:`📘 ENKRIPSI
+Penyandian data.
+Analisis: Melindungi kerahasiaan informasi.` },
+
+{ kunci:["firewall"], jawab:`📘 FIREWALL
+Penyaring lalu lintas jaringan.
+Analisis: Mencegah serangan.` },
+
+{ kunci:["phishing"], jawab:`📘 PHISHING
+Penipuan digital.
+Analisis: Banyak menargetkan pengguna awam.` },
+
+{ kunci:["hoaks"], jawab:`📘 HOAKS
+Informasi palsu.
+Analisis: Mengancam stabilitas sosial.` },
+
+{ kunci:["hak cipta"], jawab:`📘 HAK CIPTA
+Perlindungan karya digital.
+Analisis: Mencegah pembajakan.` },
+
+{ kunci:["lisensi software"], jawab:`📘 LISENSI SOFTWARE
+Izin penggunaan software.
+Analisis: Mengatur legalitas.` },
+
+{ kunci:["open source"], jawab:`📘 OPEN SOURCE
+Software bebas dikembangkan.
+Contoh: Linux.
+Analisis: Memajukan teknologi bersama.` },
+
+{ kunci:["proprietary"], jawab:`📘 PROPRIETARY SOFTWARE
+Software milik perusahaan.
+Contoh: Windows.
+Analisis: Umumnya berbayar.` },
+
+{ kunci:["startup digital"], jawab:`📘 STARTUP DIGITAL
+Perusahaan rintisan berbasis teknologi.
+Analisis: Mendorong ekonomi digital.` },
+
+{ kunci:["e-commerce"], jawab:`📘 E-COMMERCE
+Perdagangan online.
+Contoh: Tokopedia.
+Analisis: Mempermudah transaksi.` },
+
+{ kunci:["fintech"], jawab:`📘 FINTECH
+Teknologi keuangan.
+Contoh: OVO, DANA.
+Analisis: Mempercepat transaksi keuangan.` },
+
+{ kunci:["metaverse"], jawab:`📘 METAVERSE
+Dunia virtual digital.
+Analisis: Potensi masa depan internet.` },
+
+{ kunci:["virtual reality"], jawab:`📘 VIRTUAL REALITY
+Teknologi dunia maya 3D.
+Analisis: Digunakan dalam edukasi.` },
+
+{ kunci:["augmented reality"], jawab:`📘 AUGMENTED REALITY
+Menggabungkan dunia nyata dan digital.
+Analisis: Banyak di aplikasi modern.` },
+
+{ kunci:["data mining"], jawab:`📘 DATA MINING
+Penggalian data besar.
+Analisis: Menghasilkan pola tersembunyi.` },
+
+{ kunci:["algoritma sorting"], jawab:`📘 SORTING
+Proses pengurutan data.
+Contoh: Bubble sort.
+Analisis: Mempengaruhi kecepatan aplikasi.` },
+
+{ kunci:["algoritma searching"], jawab:`📘 SEARCHING
+Proses pencarian data.
+Contoh: Binary search.
+Analisis: Lebih efisien dari pencarian biasa.` },
+
+{ kunci:["binary search"], jawab:`📘 BINARY SEARCH
+Pencarian cepat pada data terurut.
+Analisis: Kompleksitas rendah.` },
+
+{ kunci:["bubble sort"], jawab:`📘 BUBBLE SORT
+Pengurutan sederhana.
+Analisis: Lambat untuk data besar.` },
+
+{ kunci:["flowchart keputusan"], jawab:`📘 FLOWCHART KEPUTUSAN
+Digunakan pada percabangan if.
+Analisis: Membantu logika program.` },
+
+{ kunci:["percabangan"], jawab:`📘 PERCABANGAN
+Struktur pemilihan.
+Contoh: if else.
+Analisis: Menentukan arah program.` },
+
+{ kunci:["perulangan"], jawab:`📘 PERULANGAN
+Menjalankan perintah berulang.
+Contoh: for, while.
+Analisis: Efisien untuk proses besar.` },
+
+{ kunci:["array"], jawab:`📘 ARRAY
+Struktur data berindeks.
+Analisis: Penyimpanan data sejenis.` },
+
+{ kunci:["boolean"], jawab:`📘 BOOLEAN
+Tipe data true/false.
+Analisis: Digunakan pada logika.` },
+
+{ kunci:["integer"], jawab:`📘 INTEGER
+Tipe data bilangan bulat.
+Analisis: Dasar perhitungan.` },
+
+{ kunci:["string"], jawab:`📘 STRING
+Tipe data teks.
+Analisis: Menyimpan informasi kata.` },
+
+{ kunci:["input output program"], jawab:`📘 INPUT OUTPUT PROGRAM
+Masukan dan keluaran program.
+Analisis: Interaksi sistem.` }, 
+
+{ kunci:["struktur data"], jawab:`📘 STRUKTUR DATA
+Cara mengorganisasi data dalam program.
+Contoh: Array, stack, queue.
+Analisis: Memengaruhi efisiensi program.` },
+
+{ kunci:["stack"], jawab:`📘 STACK
+Struktur data LIFO.
+Contoh: Undo.
+Analisis: Digunakan pada memori.` },
+
+{ kunci:["queue"], jawab:`📘 QUEUE
+Struktur data FIFO.
+Contoh: Antrian printer.
+Analisis: Digunakan pada sistem antrian.` },
+
+{ kunci:["linked list"], jawab:`📘 LINKED LIST
+Struktur data saling terhubung.
+Analisis: Lebih fleksibel dari array.` },
+
+{ kunci:["tree"], jawab:`📘 TREE
+Struktur data bercabang.
+Contoh: Folder komputer.` },
+
+{ kunci:["graph"], jawab:`📘 GRAPH
+Struktur data berbasis simpul.
+Contoh: Google Maps.` },
+
+{ kunci:["oop"], jawab:`📘 OOP
+Pemrograman berbasis objek.
+Analisis: Memudahkan pengembangan besar.` },
+
+{ kunci:["class"], jawab:`📘 CLASS
+Cetakan objek.
+Analisis: Dasar OOP.` },
+
+{ kunci:["object"], jawab:`📘 OBJECT
+Instansi dari class.
+Analisis: Dipakai dalam program nyata.` },
+
+{ kunci:["inheritance"], jawab:`📘 INHERITANCE
+Pewarisan kelas.
+Analisis: Menghemat kode.` },
+
+{ kunci:["encapsulation"], jawab:`📘 ENCAPSULATION
+Pembungkus data.
+Analisis: Melindungi data.` },
+
+{ kunci:["polymorphism"], jawab:`📘 POLYMORPHISM
+Banyak bentuk objek.
+Analisis: Fleksibilitas program.` },
+
+{ kunci:["software development"], jawab:`📘 PENGEMBANGAN PERANGKAT LUNAK
+Proses membuat aplikasi.
+Tahap: Analisis, desain, implementasi.` },
+
+{ kunci:["sdlc"], jawab:`📘 SDLC
+Siklus hidup pengembangan sistem.
+Analisis: Menjamin kualitas software.` },
+
+{ kunci:["waterfall"], jawab:`📘 WATERFALL
+Model pengembangan berurutan.` },
+
+{ kunci:["agile"], jawab:`📘 AGILE
+Model pengembangan fleksibel.` },
+
+{ kunci:["ui"], jawab:`📘 UI
+Tampilan antarmuka pengguna.` },
+
+{ kunci:["ux"], jawab:`📘 UX
+Pengalaman pengguna.` },
+
+{ kunci:["responsive web"], jawab:`📘 RESPONSIVE WEB
+Web menyesuaikan layar.` },
+
+{ kunci:["api"], jawab:`📘 API
+Penghubung antar aplikasi.` },
+
+{ kunci:["json"], jawab:`📘 JSON
+Format pertukaran data ringan.` },
+
+{ kunci:["xml"], jawab:`📘 XML
+Format data terstruktur.` },
+
+{ kunci:["http method"], jawab:`📘 HTTP METHOD
+GET, POST, PUT, DELETE.` },
+
+{ kunci:["database relational"], jawab:`📘 DATABASE RELASIONAL
+Basis data berbentuk tabel.` },
+
+{ kunci:["primary key"], jawab:`📘 PRIMARY KEY
+Kunci utama tabel.` },
+
+{ kunci:["foreign key"], jawab:`📘 FOREIGN KEY
+Penghubung antar tabel.` },
+
+{ kunci:["normalisasi"], jawab:`📘 NORMALISASI DATABASE
+Pengelompokan data efisien.` },
+
+{ kunci:["backup data"], jawab:`📘 BACKUP DATA
+Cadangan data.` },
+
+{ kunci:["restore"], jawab:`📘 RESTORE
+Mengembalikan data.` },
+
+{ kunci:["data warehouse"], jawab:`📘 DATA WAREHOUSE
+Gudang penyimpanan data besar.` },
+
+{ kunci:["cyber crime"], jawab:`📘 CYBER CRIME
+Kejahatan digital.` },
+
+{ kunci:["hacking"], jawab:`📘 HACKING
+Upaya menembus sistem.` },
+
+{ kunci:["cracking"], jawab:`📘 CRACKING
+Perusakan sistem ilegal.` },
+
+{ kunci:["brute force"], jawab:`📘 BRUTE FORCE
+Menebak password secara paksa.` },
+
+{ kunci:["ddos"], jawab:`📘 DDOS
+Serangan membanjiri server.` },
+
+{ kunci:["malware"], jawab:`📘 MALWARE
+Perangkat lunak jahat.` },
+
+{ kunci:["spyware"], jawab:`📘 SPYWARE
+Memata-matai pengguna.` },
+
+{ kunci:["ransomware"], jawab:`📘 RANSOMWARE
+Mengunci data dan meminta tebusan.` },
+
+{ kunci:["biometrik"], jawab:`📘 BIOMETRIK
+Keamanan berbasis tubuh.
+Contoh: Sidik jari.` },
+
+{ kunci:["blockchain"], jawab:`📘 BLOCKCHAIN
+Teknologi penyimpanan transaksi.` },
+
+{ kunci:["cryptocurrency"], jawab:`📘 CRYPTOCURRENCY
+Mata uang digital.` },
+
+{ kunci:["smart contract"], jawab:`📘 SMART CONTRACT
+Perjanjian otomatis digital.` },
+
+{ kunci:["deep learning"], jawab:`📘 DEEP LEARNING
+Pembelajaran AI tingkat lanjut.` },
+
+{ kunci:["neural network"], jawab:`📘 NEURAL NETWORK
+Jaringan saraf tiruan.` },
+
+{ kunci:["nlp"], jawab:`📘 NLP
+Pemrosesan bahasa alami.` },
+
+{ kunci:["computer vision"], jawab:`📘 COMPUTER VISION
+AI pengenalan gambar.` },
+
+{ kunci:["sensor"], jawab:`📘 SENSOR
+Alat pendeteksi kondisi.` },
+
+{ kunci:["actuator"], jawab:`📘 ACTUATOR
+Penggerak perangkat IoT.` },
+
+{ kunci:["smart city"], jawab:`📘 SMART CITY
+Kota berbasis teknologi.` },
+
+{ kunci:["smart home"], jawab:`📘 SMART HOME
+Rumah berbasis IoT.` },
+
+{ kunci:["digital footprint"], jawab:`📘 JEJAK DIGITAL
+Rekam jejak di internet.` },
+
+{ kunci:["siapa kamu"], jawab:`📘 saya adalah chatbot yang dirancang oleh RRSGV
+R (Rama)
+R (Robin)
+S (Syamil)
+G (Gebi)
+V (Vidal).` },
+
+{ kunci:["skor untuk projek ini"], jawab:`📘 100 per orang.` },
+
+
+{ kunci:["digital identity"], jawab:`📘 IDENTITAS DIGITAL
+Identitas di dunia maya.` },
+
+{ kunci:["literasi digital"], jawab:`📘 LITERASI DIGITAL
+Kemampuan menggunakan teknologi.` },
+
+{ kunci:["filter bubble"], jawab:`📘 FILTER BUBBLE
+Penyaringan konten otomatis.` },
+
+{ kunci:["algoritma rekomendasi"], jawab:`📘 ALGORITMA REKOMENDASI
+Memberi saran konten.` },
+
+{ kunci:["search engine"], jawab:`📘 MESIN PENCARI
+Alat pencari informasi.` },
+
+{ kunci:["seo"], jawab:`📘 SEO
+Optimasi mesin pencari.` },
+
+{ kunci:["content creator"], jawab:`📘 CONTENT CREATOR
+Pembuat konten digital.` },
+
+{ kunci:["streaming"], jawab:`📘 STREAMING
+Siaran data real-time.` },
+
+{ kunci:["latency"], jawab:`📘 LATENCY
+Waktu tunda jaringan.` },
+
+{ kunci:["bandwidth"], jawab:`📘 BANDWIDTH
+Kapasitas transfer data.` },
+
+{ kunci:["packet"], jawab:`📘 PACKET
+Unit pengiriman data.` },
+
+{ kunci:["protocol"], jawab:`📘 PROTOCOL
+Aturan komunikasi data.` },
+
+{ kunci:["osi layer"], jawab:`📘 OSI LAYER
+Model komunikasi jaringan 7 lapisan.` },
+
+{ kunci:["tcp ip"], jawab:`📘 TCP/IP
+Protokol utama internet.` },
+
+{ kunci:["gateway"], jawab:`📘 GATEWAY
+Gerbang jaringan.` },
+
+{ kunci:["proxy"], jawab:`📘 PROXY
+Perantara jaringan.` },
+
+{ kunci:["cache"], jawab:`📘 CACHE
+Penyimpanan sementara.` },
+
+{ kunci:["booting"], jawab:`📘 BOOTING
+Proses menyalakan komputer.` },
+
+{ kunci:["shutdown"], jawab:`📘 SHUTDOWN
+Proses mematikan komputer.` },
+
+{ kunci:["virtual machine"], jawab:`📘 VIRTUAL MACHINE
+Komputer virtual di dalam komputer.` },
+
+{ kunci:["hypervisor"], jawab:`📘 HYPERVISOR
+Pengelola mesin virtual.` },
+
+{ kunci:["container"], jawab:`📘 CONTAINER
+Lingkungan aplikasi ringan.` },
+
+{ kunci:["devops"], jawab:`📘 DEVOPS
+Kolaborasi developer & operator.` },
+
+{ kunci:["version control"], jawab:`📘 VERSION CONTROL
+Pengelola versi kode.
+Contoh: Git.` },
+
+{ kunci:["github"], jawab:`📘 GITHUB
+Repositori kode online.` },
+
+{ kunci:["opensource license"], jawab:`📘 LISENSI OPEN SOURCE
+Lisensi bebas pakai.` },
+
+{ kunci:["proyek informatika"], jawab:`📘 PROYEK INFORMATIKA
+Penerapan ilmu IT dalam tugas.
+Analisis: Melatih problem solving.` },
+
+{ kunci:["sistem operasi"], jawab:`📘 SISTEM OPERASI
+Pengertian: Software utama pengelola komputer.
+Contoh: Windows, Linux.
+Cara Kerja: Mengatur CPU, memori, dan perangkat.
+Manfaat: Komputer dapat berjalan stabil.
+Analisis: Tanpa OS, komputer tidak bisa digunakan.` },
+
+{ kunci:["kernel"], jawab:`📘 KERNEL
+Pengertian: Inti dari sistem operasi.
+Cara Kerja: Menghubungkan hardware dan software.
+Manfaat: Menjamin keamanan dan performa.
+Analisis: Komponen paling penting OS.` },
+
+{ kunci:["multitasking"], jawab:`📘 MULTITASKING
+Pengertian: Menjalankan banyak aplikasi bersamaan.
+Cara Kerja: CPU membagi waktu proses.
+Manfaat: Efisien bagi pengguna.
+Analisis: Beban RAM meningkat.` },
+
+{ kunci:["hardware"], jawab:`📘 HARDWARE
+Pengertian: Perangkat keras komputer.
+Contoh: CPU, RAM.
+Manfaat: Media pengolah data.
+Analisis: Tanpa hardware, software tak bisa berjalan.` },
+
+{ kunci:["software"], jawab:`📘 SOFTWARE
+Pengertian: Perangkat lunak.
+Contoh: Word, browser.
+Manfaat: Mengendalikan hardware.
+Analisis: Menentukan fungsi komputer.` },
+
+{ kunci:["firmware"], jawab:`📘 FIRMWARE
+Pengertian: Software tertanam pada perangkat.
+Contoh: BIOS.
+Manfaat: Mengatur proses awal perangkat.
+Analisis: Bersifat permanen.` },
+
+{ kunci:["bios"], jawab:`📘 BIOS
+Pengertian: Sistem awal komputer.
+Cara Kerja: Mengecek hardware saat booting.
+Manfaat: Menyiapkan OS.
+Analisis: Jika rusak, PC gagal menyala.` },
+
+{ kunci:["ram"], jawab:`📘 RAM
+Pengertian: Memori sementara.
+Cara Kerja: Menyimpan proses aktif.
+Manfaat: Mempercepat kinerja.
+Analisis: Semakin besar RAM, semakin cepat sistem.` },
+
+{ kunci:["rom"], jawab:`📘 ROM
+Pengertian: Memori permanen.
+Manfaat: Menyimpan firmware.
+Analisis: Data tidak hilang saat mati.` },
+
+{ kunci:["cpu"], jawab:`📘 CPU
+Pengertian: Otak komputer.
+Cara Kerja: Memproses instruksi.
+Manfaat: Menjalankan semua perintah.
+Analisis: Kecepatan CPU memengaruhi performa.` },
+
+{ kunci:["gpu"], jawab:`📘 GPU
+Pengertian: Pengolah grafis.
+Manfaat: Mempercepat tampilan dan AI.
+Analisis: Penting untuk gaming dan desain.` },
+
+{ kunci:["motherboard"], jawab:`📘 MOTHERBOARD
+Pengertian: Papan induk komputer.
+Manfaat: Menghubungkan semua komponen.
+Analisis: Pusat semua koneksi hardware.` },
+
+{ kunci:["storage"], jawab:`📘 STORAGE
+Pengertian: Media penyimpan data.
+Contoh: HDD, SSD.
+Manfaat: Menyimpan OS dan file.
+Analisis: SSD jauh lebih cepat.` },
+
+{ kunci:["hdd"], jawab:`📘 HDD
+Pengertian: Penyimpanan mekanik.
+Manfaat: Murah dan besar kapasitas.
+Analisis: Lebih lambat dari SSD.` },
+
+{ kunci:["ssd"], jawab:`📘 SSD
+Pengertian: Penyimpanan berbasis chip.
+Manfaat: Akses data sangat cepat.
+Analisis: Lebih mahal dari HDD.` },
+
+{ kunci:["booting"], jawab:`📘 BOOTING
+Pengertian: Proses menyalakan komputer.
+Cara Kerja: BIOS → OS → Desktop.
+Manfaat: Mengaktifkan sistem.
+Analisis: Boot lambat karena storage.` },
+
+{ kunci:["shutdown"], jawab:`📘 SHUTDOWN
+Pengertian: Mematikan sistem.
+Manfaat: Mencegah kerusakan data.
+Analisis: Paksa mati bisa merusak file.` },
+
+{ kunci:["file system"], jawab:`📘 FILE SYSTEM
+Pengertian: Cara penyimpanan data.
+Contoh: FAT32, NTFS.
+Manfaat: Mengatur file.
+Analisis: Tanpa file system, data berantakan.` },
+
+{ kunci:["format"], jawab:`📘 FORMAT
+Pengertian: Menghapus seluruh isi storage.
+Manfaat: Memulai ulang sistem.
+Analisis: Data tidak bisa dikembalikan.` },
+
+{ kunci:["driver"], jawab:`📘 DRIVER
+Pengertian: Penghubung hardware dan OS.
+Manfaat: Perangkat bisa berfungsi.
+Analisis: Tanpa driver, perangkat tidak dikenali.` },
+
+{ kunci:["compiler"], jawab:`📘 COMPILER
+Pengertian: Pengubah kode ke bahasa mesin.
+Manfaat: Program bisa dijalankan.
+Analisis: Penting dalam pemrograman.` },
+
+{ kunci:["interpreter"], jawab:`📘 INTERPRETER
+Pengertian: Penerjemah langsung baris per baris.
+Contoh: Python.
+Manfaat: Mudah debugging.
+Analisis: Lebih lambat dari compiler.` },
+
+{ kunci:["debugging"], jawab:`📘 DEBUGGING
+Pengertian: Mencari kesalahan program.
+Manfaat: Memperbaiki error.
+Analisis: Tahap penting coding.` },
+
+{ kunci:["error"], jawab:`📘 ERROR
+Pengertian: Kesalahan program.
+Jenis: Syntax, runtime.
+Analisis: Harus diperbaiki agar program berjalan.` },
+
+{ kunci:["logic error"], jawab:`📘 LOGIC ERROR
+Kesalahan alur berpikir program.
+Analisis: Sulit dideteksi karena program tetap jalan.` },
+
+{ kunci:["runtime error"], jawab:`📘 RUNTIME ERROR
+Error saat program dijalankan.
+Analisis: Program langsung berhenti.` },
+
+{ kunci:["syntax error"], jawab:`📘 SYNTAX ERROR
+Kesalahan penulisan kode.
+Analisis: Program tidak bisa dikompilasi.` },
+
+{ kunci:["flow control"], jawab:`📘 FLOW CONTROL
+Pengatur alur program.
+Contoh: if, loop.
+Analisis: Mengatur logika program.` },
+
+{ kunci:["looping"], jawab:`📘 LOOPING
+Perulangan program.
+Contoh: for, while.
+Manfaat: Menghemat kode.
+Analisis: Bisa menyebabkan infinite loop.` },
+
+{ kunci:["percabangan"], jawab:`📘 PERCABANGAN
+Pemilihan kondisi.
+Contoh: if else.
+Analisis: Mengatur keputusan program.` },
+
+{ kunci:["input output"], jawab:`📘 INPUT OUTPUT
+Masukan dan keluaran data.
+Contoh: Keyboard dan layar.
+Analisis: Komunikasi user dengan sistem.` },
+
+{ kunci:["enkripsi"], jawab:`📘 ENKRIPSI
+Pengamanan data dengan sandi.
+Manfaat: Menjaga kerahasiaan.
+Analisis: Digunakan di perbankan.` },
+
+{ kunci:["dekripsi"], jawab:`📘 DEKRIPSI
+Membuka data terenkripsi.
+Analisis: Kunci harus sesuai.` },
+
+{ kunci:["firewall"], jawab:`📘 FIREWALL
+Penyaring akses jaringan.
+Manfaat: Mencegah serangan.
+Analisis: Pelindung utama jaringan.` },
+
+{ kunci:["otp"], jawab:`📘 OTP
+Password sekali pakai.
+Manfaat: Keamanan tambahan.
+Analisis: Digunakan saat login.` },
+
+{ kunci:["two factor authentication"], jawab:`📘 2FA
+Keamanan dua lapis.
+Manfaat: Akun lebih aman.
+Analisis: Digunakan sosial media.` },
+
+{ kunci:["phishing"], jawab:`📘 PHISHING
+Penipuan digital.
+Manfaat: Penting dihindari.
+Analisis: Sering lewat email palsu.` },
+
+{ kunci:["social engineering"], jawab:`📘 SOCIAL ENGINEERING
+Manipulasi psikologis.
+Analisis: Menargetkan manusia.` },
+
+{ kunci:["backup cloud"], jawab:`📘 BACKUP CLOUD
+Cadangan data online.
+Manfaat: Data aman.
+Analisis: Menghindari kehilangan data.` },
+
+{ kunci:["digital forensik"], jawab:`📘 DIGITAL FORENSIK
+Analisis barang bukti digital.
+Manfaat: Membongkar kejahatan.
+Analisis: Digunakan kepolisian.` },
+
+{ kunci:["it support"], jawab:`📘 IT SUPPORT
+Teknisi sistem komputer.
+Manfaat: Menangani masalah IT.
+Analisis: Profesi penting.` },
+
+{ kunci:["programmer"], jawab:`📘 PROGRAMMER
+Pembuat aplikasi.
+Manfaat: Mengembangkan sistem digital.
+Analisis: Dibutuhkan semua industri.` },
+
+{ kunci:["data analyst"], jawab:`📘 DATA ANALYST
+Penganalisis data.
+Manfaat: Membantu pengambilan keputusan.
+Analisis: Profesi masa depan.` },
+
+{ kunci:["data scientist"], jawab:`📘 DATA SCIENTIST
+Ahli olah data dan AI.
+Analisis: Perpaduan statistik & IT.` }
+
+
+];
+
+/* =========================================================
+   MESIN ANALISIS PERTANYAAN (BUKAN COCOK KATA SEDERHANA)
+========================================================= */
+const chatBox=document.getElementById("chatBox");
+
+function addMsg(text,cls){
+  let d=document.createElement("div");
+  d.className="msg "+cls;
+  d.innerText=text;
+  chatBox.appendChild(d);
+  chatBox.scrollTop=chatBox.scrollHeight;
+}
+
+function analyzeQuestion(q){
+  q=q.toLowerCase();
+  let bestScore=0;
+  let bestAnswer=null;
+
+  for(let item of KB){
+    let score=0;
+    for(let k of item.kunci){
+      if(q.includes(k)) score++;
+    }
+    if(score>bestScore){
+      bestScore=score;
+      bestAnswer=item.jawab;
+    }
+  }
+
+  return bestScore>0 ? bestAnswer
+  : "❌ Maaf, materi belum ada di database. Silakan tambahkan.";
+}
+
+function send(){
+  const input=document.getElementById("userInput");
+  let text=input.value.trim();
+  if(!text) return;
+  addMsg(text,"user");
+  input.value="";
+  let reply=analyzeQuestion(text);
+  addMsg(reply,"bot");
+  speak(reply);
+}
+
+function autoSend(t){
+  document.getElementById("userInput").value=t;
+  send();
+}
+
+/* ======================
+   VOICE INPUT + OUTPUT
+====================== */
+function voice(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){alert("Voice tidak didukung");return;}
+  const r=new SR();
+  r.lang="id-ID";
+  r.onresult=e=>{
+    document.getElementById("userInput").value=e.results[0][0].transcript;
+    send();
+  };
+  r.start();
+}
+
+function speak(text){
+  if(!window.speechSynthesis) return;
+  let u=new SpeechSynthesisUtterance(text);
+  u.lang="id-ID";
+  speechSynthesis.cancel();
+  speechSynthesis.speak(u);
+}
+</script>
+</body>
+</html>
